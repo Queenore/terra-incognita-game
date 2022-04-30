@@ -5,20 +5,20 @@ class Matrix(private val height: Int, private val width: Int) {
     init {
         for (row in 0..height + 1) {
             for (column in 0..width + 1) {
-                list[row][column] = '#'
+                list[row][column] = '@'
             }
         }
     }
 
     fun get(x: Int, y: Int): Char {
         if (x !in 1..height || y !in 1..width)
-            return ' '
+            throw IllegalArgumentException()
         return list[x][y]
     }
 
     fun set(x: Int, y: Int, elem: Char) {
         if (x !in 1..height || y !in 1..width)
-            return
+            throw IllegalArgumentException()
         else list[x][y] = elem
     }
 

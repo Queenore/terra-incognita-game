@@ -1,0 +1,1 @@
+data class BFS(var visit: Boolean, var dist: Int = Int.MAX_VALUE, var prev: Graph.Vertex?)

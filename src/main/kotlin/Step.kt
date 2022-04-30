@@ -1,1 +1,0 @@
-data class Step(val prevCoord: Pair<Int, Int>, val nextCoord: Pair<Int, Int>)

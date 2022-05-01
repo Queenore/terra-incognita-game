@@ -1,4 +1,5 @@
 class Graph {
+
     data class Vertex(val coord: Pair<Int, Int>) {
         val neighbors = mutableSetOf<Pair<Vertex, Int>>()
     }
@@ -17,4 +18,5 @@ class Graph {
     }
 
     fun connect(first: Pair<Int, Int>, second: Pair<Int, Int>, weight: Int) = connect(this[first], this[second], weight)
+
 }

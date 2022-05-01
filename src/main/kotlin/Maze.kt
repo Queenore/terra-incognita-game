@@ -25,8 +25,16 @@ class Maze(val height: Int, val width: Int) {
         }
     }
 
+    fun copy(): Maze {
+        val maze = Maze(height, width)
+        for (x in 1..height)
+            for (y in 1..width)
+                maze.matrix.set(x, y, this.matrix.get(x, y))
+        return maze
+    }
+
     /**
-     * prob must be in 0..100
+     * prob must be in the range 0..100
      */
     fun dispelMaze(prob: Double) {
         if (prob !in 0.0..100.0)
@@ -43,12 +51,8 @@ class Maze(val height: Int, val width: Int) {
 
         do coord1 = Pair((1..height).random(), (1..width / 2).random())
         while (matrix.get(coord1.first, coord1.second) != ' ')
-
         do coord2 = Pair((1..height).random(), (width / 2 + 1..width).random())
         while (matrix.get(coord2.first, coord2.second) != ' ')
-
-//        matrix.set(coord1.first, coord1.second, '.')
-//        matrix.set(coord2.first, coord2.second, '.')
 
         return TwoCoords(coord1, coord2)
     }
@@ -88,11 +92,10 @@ class Maze(val height: Int, val width: Int) {
     private fun establishConnect(step: TwoCoords) {
         val prev = step.firstCoord
         val next = step.secondCoord
-        if (prev.first - next.first != 0) {
+        if (prev.first - next.first != 0)
             matrix.set(if (prev.first > next.first) next.first + 1 else prev.first + 1, prev.second, ' ')
-        } else if (prev.second - next.second != 0) {
+        else if (prev.second - next.second != 0)
             matrix.set(prev.first, if (prev.second > next.second) next.second + 1 else prev.second + 1, ' ')
-        }
     }
 
     private fun updatePossibleSteps(step: TwoCoords) {

@@ -1,8 +1,7 @@
 import kotlin.random.Random
 
-class Maze(val height: Int, val width: Int) {
+data class Maze(val height: Int, val width: Int, private val matrix: Matrix = Matrix(height, width)) {
 
-    private val matrix = Matrix(height, width)
     private val possibleSteps = mutableSetOf<TwoCoords>()
 
     /**
@@ -16,16 +15,19 @@ class Maze(val height: Int, val width: Int) {
     }
 
     fun printMaze() {
-        matrix.printMatrix()
+        print(matrix.toString())
     }
 
-    fun printPath(path: MutableList<Pair<Int, Int>>) {
+    fun printTrace(path: MutableList<Pair<Int, Int>>) {
         path.forEach {
-            matrix.set(it.first, it.second, '.')
+            matrix.set(it.first, it.second, Cell.Trace)
         }
     }
 
-    fun copy(): Maze {
+    /**
+     * creating a copy of a Maze with properties that do not refer to any other
+     */
+    fun deepCopy(): Maze {
         val maze = Maze(height, width)
         for (x in 1..height)
             for (y in 1..width)
@@ -33,26 +35,14 @@ class Maze(val height: Int, val width: Int) {
         return maze
     }
 
-    /**
-     * prob must be in the range 0..100
-     */
-    fun dispelMaze(prob: Double) {
-        if (prob !in 0.0..100.0)
-            throw IllegalArgumentException()
-        for (x in 1..height)
-            for (y in 1..width)
-                if (Random.nextDouble(0.0, 100.0) in 0.0..prob)
-                    matrix.set(x, y, ' ')
-    }
-
     fun getTwoRandCoords(): TwoCoords {
         var coord1: Pair<Int, Int>
         var coord2: Pair<Int, Int>
 
         do coord1 = Pair((1..height).random(), (1..width / 2).random())
-        while (matrix.get(coord1.first, coord1.second) != ' ')
+        while (matrix.get(coord1.first, coord1.second) != Cell.Empty)
         do coord2 = Pair((1..height).random(), (width / 2 + 1..width).random())
-        while (matrix.get(coord2.first, coord2.second) != ' ')
+        while (matrix.get(coord2.first, coord2.second) != Cell.Empty)
 
         return TwoCoords(coord1, coord2)
     }
@@ -65,7 +55,7 @@ class Maze(val height: Int, val width: Int) {
 
         while (possibleSteps.isNotEmpty()) {
             val currStep = getNextRandCoord()
-            matrix.set(currStep.secondCoord.first, currStep.secondCoord.second, ' ')
+            matrix.set(currStep.secondCoord.first, currStep.secondCoord.second, Cell.Empty)
             establishConnect(currStep)
             updatePossibleSteps(currStep)
         }
@@ -93,28 +83,36 @@ class Maze(val height: Int, val width: Int) {
         val prev = step.firstCoord
         val next = step.secondCoord
         if (prev.first - next.first != 0)
-            matrix.set(if (prev.first > next.first) next.first + 1 else prev.first + 1, prev.second, ' ')
+            matrix.set(if (prev.first > next.first) next.first + 1 else prev.first + 1, prev.second, Cell.Empty)
         else if (prev.second - next.second != 0)
-            matrix.set(prev.first, if (prev.second > next.second) next.second + 1 else prev.second + 1, ' ')
+            matrix.set(prev.first, if (prev.second > next.second) next.second + 1 else prev.second + 1, Cell.Empty)
+    }
+
+    /**
+     * a function that generates new coordinates in the up, down, left, right directions
+     */
+    private fun getNewCoords(currCoord: Pair<Int, Int>, dir: Int, dist: Int): Pair<Int, Int> {
+        val first = currCoord.first + when (dir) {
+            1 -> dist
+            2 -> 0
+            3 -> -dist
+            else -> 0
+        }
+        val second = currCoord.second + when (dir) {
+            1 -> 0
+            2 -> dist
+            3 -> 0
+            else -> -dist
+        }
+        return Pair(first, second)
     }
 
     private fun updatePossibleSteps(step: TwoCoords) {
         val nextCoord = step.secondCoord
 
         for (dir in 1..4) {
-            val newX = nextCoord.first + when (dir) {
-                1 -> 2
-                2 -> 0
-                3 -> -2
-                else -> 0
-            }
-            val newY = nextCoord.second + when (dir) {
-                1 -> 0
-                2 -> 2
-                3 -> 0
-                else -> -2
-            }
-            if (newX in 1..height && newY in 1..width && matrix.get(newX, newY) == '@')
+            val (newX, newY) = getNewCoords(nextCoord, dir, 2)
+            if (newX in 1..height && newY in 1..width && matrix.get(newX, newY) == Cell.Wall)
                 possibleSteps.add(TwoCoords(nextCoord, Pair(newX, newY)))
         }
 
@@ -124,36 +122,44 @@ class Maze(val height: Int, val width: Int) {
                 iterator.remove()
     }
 
+    /**
+     * prob must be in the range 0..100
+     */
+    fun dispelMaze(prob: Double) {
+        if (prob !in 0.0..100.0)
+            throw IllegalArgumentException()
+        for (x in 1..height)
+            for (y in 1..width) {
+                var count = 0
+                for (dir in 1..4) {
+                    val (newX, newY) = getNewCoords(Pair(x, y), dir, 1)
+                    if (newX in 1..height && newY in 1..width && matrix.get(newX, newY) == Cell.Wall)
+                        count++
+                }
+                if (Random.nextDouble(0.0, 100.0) in 0.0..prob && count < 4)
+                    matrix.set(x, y, Cell.Empty)
+            }
+    }
+
     fun graphFromMaze(): Graph {
         val graph = Graph()
 
         for (x in 1..height)
-            for (y in 1..width)
+            for (y in 1..width) {
+                val firstIsEmpty = matrix.get(x, y) == Cell.Empty
                 for (dir in 1..4) {
-                    val newX = x + when (dir) {
-                        1 -> 1
-                        2 -> 0
-                        3 -> -1
-                        else -> 0
-                    }
-                    val newY = y + when (dir) {
-                        1 -> 0
-                        2 -> 1
-                        3 -> 0
-                        else -> -1
-                    }
-                    if (newX in 1..height && newY in 1..width &&
-                        matrix.get(x, y) == ' ' && matrix.get(newX, newY) == ' '
-                    ) {
-                        if (!graph.vertices.containsKey(Pair(x, y)))
-                            graph.addVertex(Pair(x, y))
-                        if (!graph.vertices.containsKey(Pair(newX, newY)))
+                    val (newX, newY) = getNewCoords(Pair(x, y), dir, 1)
+                    if (!graph.vertices.containsKey(Pair(x, y)) && firstIsEmpty)
+                        graph.addVertex(Pair(x, y))
+                    if (newX in 1..height && newY in 1..width) {
+                        val secondIsEmpty = matrix.get(newX, newY) == Cell.Empty
+                        if (!graph.vertices.containsKey(Pair(newX, newY)) && secondIsEmpty)
                             graph.addVertex(Pair(newX, newY))
-
-                        graph.connect(Pair(x, y), Pair(newX, newY), 1)
-
+                        if (firstIsEmpty && secondIsEmpty)
+                            graph.connect(Pair(x, y), Pair(newX, newY), 1)
                     }
                 }
+            }
 
         return graph
     }

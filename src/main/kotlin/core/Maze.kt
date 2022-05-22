@@ -1,3 +1,5 @@
+package core
+
 import kotlin.random.Random
 
 data class Maze(val height: Int, val width: Int, private val matrix: Matrix = Matrix(height, width)) {
@@ -25,7 +27,7 @@ data class Maze(val height: Int, val width: Int, private val matrix: Matrix = Ma
     }
 
     /**
-     * creating a copy of a Maze with properties that do not refer to any other
+     * creating a copy of a Core.Maze with properties that do not refer to any other
      */
     fun deepCopy(): Maze {
         val maze = Maze(height, width)
@@ -36,15 +38,7 @@ data class Maze(val height: Int, val width: Int, private val matrix: Matrix = Ma
     }
 
     fun getTwoRandCoords(): TwoCoords {
-        var coord1: Pair<Int, Int>
-        var coord2: Pair<Int, Int>
-
-        do coord1 = Pair((1..height).random(), (1..width / 2).random())
-        while (matrix.get(coord1.first, coord1.second) != Cell.Empty)
-        do coord2 = Pair((1..height).random(), (width / 2 + 1..width).random())
-        while (matrix.get(coord2.first, coord2.second) != Cell.Empty)
-
-        return TwoCoords(coord1, coord2)
+        return matrix.twoRandCoords()
     }
 
     private fun generateMaze(matrix: Matrix) {
@@ -127,7 +121,8 @@ data class Maze(val height: Int, val width: Int, private val matrix: Matrix = Ma
      */
     fun dispelMaze(prob: Double) {
         if (prob !in 0.0..100.0)
-            throw IllegalArgumentException()
+            throw IllegalArgumentException("prob must be in the range 0..100")
+
         for (x in 1..height)
             for (y in 1..width) {
                 var count = 0
@@ -141,7 +136,7 @@ data class Maze(val height: Int, val width: Int, private val matrix: Matrix = Ma
             }
     }
 
-    fun graphFromMaze(): Graph {
+    fun graphFromMaze(edgeWeight: Double): Graph {
         val graph = Graph()
 
         for (x in 1..height)
@@ -156,7 +151,7 @@ data class Maze(val height: Int, val width: Int, private val matrix: Matrix = Ma
                         if (!graph.vertices.containsKey(Pair(newX, newY)) && secondIsEmpty)
                             graph.addVertex(Pair(newX, newY))
                         if (firstIsEmpty && secondIsEmpty)
-                            graph.connect(Pair(x, y), Pair(newX, newY), 1)
+                            graph.connect(Pair(x, y), Pair(newX, newY), edgeWeight)
                     }
                 }
             }

@@ -14,7 +14,7 @@ class BFS(private val maze: Maze, twoCoords: TwoCoords, edgeWeightForGraph: Doub
     private var mazeGraph = maze.graphFromMaze(edgeWeightForGraph)
     private var solveFlag = false
 
-    override fun getTraceLength(): Int {
+    override fun getPathLength(): Int {
         if (solveFlag)
             return trace.size
         else throw IllegalStateException()
@@ -67,7 +67,7 @@ class BFS(private val maze: Maze, twoCoords: TwoCoords, edgeWeightForGraph: Doub
                     break
             }
 
-            // restoring the trace
+            // восстанавливаем самый короткий путь
             var curr = info[vert[finish]!!]
             while (curr!!.prev!!.coord != start) {
                 trace.add(curr.prev!!.coord)

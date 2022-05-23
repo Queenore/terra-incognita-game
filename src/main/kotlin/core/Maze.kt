@@ -82,6 +82,21 @@ data class Maze(val height: Int, val width: Int, private val matrix: Matrix = Ma
             matrix.set(prev.first, if (prev.second > next.second) next.second + 1 else prev.second + 1, Cell.Empty)
     }
 
+    private fun updatePossibleSteps(step: TwoCoords) {
+        val nextCoord = step.secondCoord
+
+        for (dir in 1..4) {
+            val (newX, newY) = getNewCoords(nextCoord, dir, 2)
+            if (newX in 1..height && newY in 1..width && matrix.get(newX, newY) == Cell.Wall)
+                possibleSteps.add(TwoCoords(nextCoord, Pair(newX, newY)))
+        }
+
+        val iterator = possibleSteps.iterator()
+        while (iterator.hasNext())
+            if (iterator.next().secondCoord == nextCoord)
+                iterator.remove()
+    }
+
     /**
      * a function that generates new coordinates in the up, down, left, right directions
      */
@@ -99,21 +114,6 @@ data class Maze(val height: Int, val width: Int, private val matrix: Matrix = Ma
             else -> -dist
         }
         return Pair(first, second)
-    }
-
-    private fun updatePossibleSteps(step: TwoCoords) {
-        val nextCoord = step.secondCoord
-
-        for (dir in 1..4) {
-            val (newX, newY) = getNewCoords(nextCoord, dir, 2)
-            if (newX in 1..height && newY in 1..width && matrix.get(newX, newY) == Cell.Wall)
-                possibleSteps.add(TwoCoords(nextCoord, Pair(newX, newY)))
-        }
-
-        val iterator = possibleSteps.iterator()
-        while (iterator.hasNext())
-            if (iterator.next().secondCoord == nextCoord)
-                iterator.remove()
     }
 
     /**

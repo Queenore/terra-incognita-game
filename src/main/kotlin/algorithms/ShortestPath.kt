@@ -6,7 +6,7 @@ interface ShortestPath {
      * Returns the length of the shortest path.
      * @throws IllegalStateException if it was called before solve() call
      */
-    fun getTraceLength(): Int
+    fun getPathLength(): Int
 
     /**
      * Returns the execution time of solve() function

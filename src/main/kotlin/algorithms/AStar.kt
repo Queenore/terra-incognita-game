@@ -15,7 +15,7 @@ class AStar(private val maze: Maze, twoCoords: TwoCoords, edgeWeightForGraph: Do
     private var mazeGraph = maze.graphFromMaze(edgeWeightForGraph)
     private var solveFlag = false
 
-    override fun getTraceLength(): Int {
+    override fun getPathLength(): Int {
         if (solveFlag)
             return trace.size
         else throw IllegalStateException()
@@ -47,7 +47,7 @@ class AStar(private val maze: Maze, twoCoords: TwoCoords, edgeWeightForGraph: Do
         var distToStart: Int = 10000000,
         var distToFinish: Int = 10000000,
         var prev: Graph.Vertex? = null,
-    ) //
+    )
 
     private fun manhattDist(a: Pair<Int, Int>, b: Pair<Int, Int>) =
         abs(a.first - b.first) + abs(a.second - b.second)
@@ -80,7 +80,7 @@ class AStar(private val maze: Maze, twoCoords: TwoCoords, edgeWeightForGraph: Do
                     break
             }
 
-            // restoring the trace
+            // восстанавливаем самый короткий путь
             var curr = info[vert[finish]!!]
             while (curr!!.prev!!.coord != start) {
                 trace.add(curr.prev!!.coord)

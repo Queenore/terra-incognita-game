@@ -1,7 +1,7 @@
 package core
 
 enum class Operations {
-    PLus,
+    Plus,
     Minus,
     Times,
     Div

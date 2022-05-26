@@ -82,7 +82,7 @@ class GraphTests {
         graph.connect(first, fourth, 0.4)
         graph.connect(second, third, 0.4)
         graph.connect(third, fifth, 0.4)
-        graph.changeAllWeights(0.6, Operations.PLus)
+        graph.changeAllWeights(0.6, Operations.Plus)
 
         graph.vertices.forEach {
             it.value.neighbors.forEach {it1 ->

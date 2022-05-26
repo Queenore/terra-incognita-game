@@ -100,7 +100,7 @@ class AntAlg(private val maze: Maze, twoCoords: TwoCoords) : ShortestPath {
                     if (trace.isNotEmpty() && trace.last().secondCoord == finish && trace.size <= shortestPath) {
                         for (coords in trace)
                             mazeGraph.changeWeight(coords.firstCoord, coords.secondCoord,
-                                1.0 / trace.size, Operations.PLus)
+                                1.0 / trace.size, Operations.Plus)
                         if (shortestPath > trace.size)
                             shortestPath = trace.size
                     }

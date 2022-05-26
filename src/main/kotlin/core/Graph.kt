@@ -23,7 +23,7 @@ class Graph {
     private fun changeWeight(first: Vertex, second: Vertex, number: Double, oper: Operations) {
         val prevWeight = first.neighbors[second]
         val newWeight = when (oper) {
-            Operations.PLus -> prevWeight?.plus(number)
+            Operations.Plus -> prevWeight?.plus(number)
             Operations.Minus -> prevWeight?.minus(number)
             Operations.Times -> prevWeight?.times(number)
             else -> prevWeight?.div(number)
@@ -37,7 +37,7 @@ class Graph {
             for (u in v.value.neighbors)
                 u.setValue(
                     when (oper) {
-                        Operations.PLus -> u.value + number
+                        Operations.Plus -> u.value + number
                         Operations.Minus -> u.value - number
                         Operations.Times -> u.value * number
                         else -> u.value / number
